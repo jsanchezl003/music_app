@@ -1,16 +1,11 @@
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export default function AlbumCard({ album }) {
-  const [userRating, setUserRating] = useState(0);
-
-  // Cargar la calificación guardada del localStorage
-  useEffect(() => {
+  const [userRating] = useState(() => {
     const savedRating = localStorage.getItem(`album-rating-${album.id}`);
-    if (savedRating) {
-      setUserRating(parseInt(savedRating));
-    }
-  }, [album.id]);
+    return savedRating ? parseInt(savedRating) : 0;
+  });
 
   return (
     <Link to={`/album/${album.id}`} className="album-card">

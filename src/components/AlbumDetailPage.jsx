@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { getAlbumById, getReviewsForAlbum } from '../data/musicData';
 import TrackList from './TrackList';
 import ReviewList from './ReviewList';
@@ -8,18 +8,11 @@ export default function AlbumDetailPage() {
   const { id } = useParams();
   const album = getAlbumById(id);
   const reviews = getReviewsForAlbum(album?.id);
-  const [userRating, setUserRating] = useState(0);
+  const [userRating, setUserRating] = useState(() => {
+    const savedRating = localStorage.getItem(`album-rating-${album?.id}`);
+    return savedRating ? parseInt(savedRating) : 0;
+  });
   const [hoverRating, setHoverRating] = useState(0);
-
-  // Cargar la calificación guardada del localStorage
-  useEffect(() => {
-    if (album) {
-      const savedRating = localStorage.getItem(`album-rating-${album.id}`);
-      if (savedRating) {
-        setUserRating(parseInt(savedRating));
-      }
-    }
-  }, [album]);
 
   // Manejar el clic en una estrella
   const handleRating = (rating) => {

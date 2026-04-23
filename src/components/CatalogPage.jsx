@@ -8,6 +8,18 @@ export default function CatalogPage() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const albums = musicData.albums;
   const currentAlbum = albums[currentIndex];
+  
+  // Inicializar calificaciones usando lazy initialization
+  const [userRatings] = useState(() => {
+    const ratings = {};
+    musicData.albums.forEach(album => {
+      const savedRating = localStorage.getItem(`album-rating-${album.id}`);
+      if (savedRating) {
+        ratings[album.id] = parseInt(savedRating);
+      }
+    });
+    return ratings;
+  });
 
   // Avance automático del carrusel
   useEffect(() => {
@@ -188,7 +200,9 @@ export default function CatalogPage() {
               </div>
               <div>
                 <p style={{ color: '#6b7280', fontSize: '0.9rem', marginBottom: '0.25rem' }}>CALIFICACIÓN</p>
-                <p style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#fbbf24' }}>⭐ {currentAlbum.rating}</p>
+                <p style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#fbbf24' }}>
+                  {userRatings[currentAlbum.id] > 0 ? `⭐ ${userRatings[currentAlbum.id]}/5` : '⭐ Sin calificar'}
+                </p>
               </div>
             </div>
             <p style={{
