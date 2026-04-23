@@ -1,4 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { getAlbumById, getReviewsForAlbum } from '../data/musicData';
 import TrackList from './TrackList';
 import ReviewList from './ReviewList';
@@ -7,6 +8,24 @@ export default function AlbumDetailPage() {
   const { id } = useParams();
   const album = getAlbumById(id);
   const reviews = getReviewsForAlbum(album?.id);
+  const [userRating, setUserRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+
+  // Cargar la calificación guardada del localStorage
+  useEffect(() => {
+    if (album) {
+      const savedRating = localStorage.getItem(`album-rating-${album.id}`);
+      if (savedRating) {
+        setUserRating(parseInt(savedRating));
+      }
+    }
+  }, [album]);
+
+  // Manejar el clic en una estrella
+  const handleRating = (rating) => {
+    setUserRating(rating);
+    localStorage.setItem(`album-rating-${album.id}`, rating);
+  };
 
   if (!album) {
     return (
@@ -32,8 +51,23 @@ export default function AlbumDetailPage() {
             <p className="artist">{album.artist}</p>
             <div className="album-stats">
               <div className="stat">
-                <span className="stat-label">Calificación</span>
-                <span className="stat-value">⭐ {album.rating}</span>
+                <span className="stat-label">Tu Calificación</span>
+                <div 
+                  className="album-rating-stars-detail"
+                  onMouseLeave={() => setHoverRating(0)}
+                >
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span
+                      key={star}
+                      className={`star-detail ${star <= (hoverRating || userRating) ? 'filled' : 'empty'}`}
+                      onMouseEnter={() => setHoverRating(star)}
+                      onClick={() => handleRating(star)}
+                    >
+                      ⭐
+                    </span>
+                  ))}
+                  {userRating > 0 && <span className="rating-text-detail">{userRating}/5</span>}
+                </div>
               </div>
               <div className="stat">
                 <span className="stat-label">Año</span>
